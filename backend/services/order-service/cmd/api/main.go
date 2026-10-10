@@ -33,7 +33,10 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
-	r.Get("/healthz", handler.Health)
+
+	health := handler.NewHealthHandler(db)
+	r.Get("/healthz", health.Live)
+	r.Get("/readyz", health.Ready)
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.HTTPPort,
