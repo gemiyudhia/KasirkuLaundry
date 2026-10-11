@@ -49,6 +49,17 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Order Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
