@@ -70,3 +70,25 @@ func (s *OrderService) GetByID(ctx context.Context, id int64) (*domain.Order, er
 func generateOrderCode() string {
 	return fmt.Sprintf("LDY-%s-%04d", time.Now().Format("20060102"), rand.IntN(10000))
 }
+
+func (s *OrderService) List(ctx context.Context, status string, page, limit int) ([]domain.Order, int, error) {
+	return s.repo.List(ctx, repository.ListFilter{
+		Status: status,
+		Limit:  limit,
+		Offset: (page - 1) * limit,
+	})
+}
+
+func (s *OrderService) UpdateStatus(ctx context.Context, id int64, next domain.OrderStatus) (*domain.Order, error) {
+	order, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if !order.Status.CanTransitionTo(next) {
+		return nil, domain.ErrInvalidStatusTransition
+	}
+	if err := s.repo.UpdateStatus(ctx, id, order.Status, next); err != nil {
+		return nil, err
+	}
+	return s.repo.GetByID(ctx, id)
+}

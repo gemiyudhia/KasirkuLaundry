@@ -16,6 +16,12 @@ func NewOrderRepository(db *sql.DB) *OrderRepository {
 	return &OrderRepository{db: db}
 }
 
+type ListFilter struct {
+	Status string
+	Limit  int
+	Offset int
+}
+
 func (r *OrderRepository) Create(ctx context.Context, o *domain.Order) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -93,4 +99,59 @@ func (r *OrderRepository) GetByID(ctx context.Context, id int64) (*domain.Order,
 		o.Items = append(o.Items, it)
 	}
 	return &o, rows.Err()
+}
+
+func (r *OrderRepository) List(ctx context.Context, f ListFilter) ([]domain.Order, int, error) {
+	where := ""
+	args := []any{}
+	if f.Status != "" {
+		where = " WHERE status = ?"
+		args = append(args, f.Status)
+	}
+
+	var total int
+	if err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM orders"+where, args...).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	query := `SELECT id, order_code, customer_name, customer_phone, status, total_amount, notes, created_at, updated_at
+	          FROM orders` + where + ` ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?`
+	rows, err := r.db.QueryContext(ctx, query, append(args, f.Limit, f.Offset)...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	orders := []domain.Order{}
+	for rows.Next() {
+		var (
+			o      domain.Order
+			status string
+			notes  sql.NullString
+		)
+		if err := rows.Scan(&o.ID, &o.OrderCode, &o.CustomerName, &o.CustomerPhone, &status,
+			&o.TotalAmount, &notes, &o.CreatedAt, &o.UpdatedAt); err != nil {
+			return nil, 0, err
+		}
+		o.Status = domain.OrderStatus(status)
+		o.Notes = notes.String
+		orders = append(orders, o)
+	}
+	return orders, total, rows.Err()
+}
+
+func (r *OrderRepository) UpdateStatus(ctx context.Context, id int64, from, to domain.OrderStatus) error {
+	res, err := r.db.ExecContext(ctx,
+		`UPDATE orders SET status = ? WHERE id = ? AND status = ?`, to, id, from)
+	if err != nil {
+		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return domain.ErrInvalidStatusTransition
+	}
+	return nil
 }

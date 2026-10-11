@@ -14,6 +14,26 @@ const (
 	StatusCompleted  OrderStatus = "completed"
 )
 
+var ErrInvalidStatusTransition = errors.New("invalid status transition")
+
+var nextStatus = map[OrderStatus]OrderStatus{
+	StatusReceived:   StatusProcessing,
+	StatusProcessing: StatusReady,
+	StatusReady:      StatusCompleted,
+}
+
+func (s OrderStatus) IsValid() bool {
+	switch s {
+	case StatusReceived, StatusProcessing, StatusReady, StatusCompleted:
+		return true
+	}
+	return false
+}
+
+func (s OrderStatus) CanTransitionTo(next OrderStatus) bool {
+	return nextStatus[s] == next
+}
+
 var ErrOrderNotFound = errors.New("order not found")
 
 type Order struct {
@@ -24,7 +44,7 @@ type Order struct {
 	Status        OrderStatus `json:"status"`
 	TotalAmount   int64       `json:"total_amount"`
 	Notes         string      `json:"notes,omitempty"`
-	Items         []OrderItem `json:"items"`
+	Items         []OrderItem `json:"items,omitempty"`
 	CreatedAt     time.Time   `json:"created_at"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 }

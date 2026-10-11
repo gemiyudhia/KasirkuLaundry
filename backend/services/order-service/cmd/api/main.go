@@ -45,8 +45,10 @@ func main() {
 	orderHandler := handler.NewOrderHandler(orderSvc)
 
 	r.Route("/orders", func(r chi.Router) {
+		r.Get("/", orderHandler.List)
 		r.Post("/", orderHandler.Create)
 		r.Get("/{id}", orderHandler.GetByID)
+		r.Patch("/{id}/status", orderHandler.UpdateStatus)
 	})
 
 	r.Get("/readyz", health.Ready)
