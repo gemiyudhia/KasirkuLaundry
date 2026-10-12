@@ -13,12 +13,15 @@ import (
 	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/config"
 	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/database"
 	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/handler"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/repository"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/service"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 	cfg := config.Load()
 
 	db, err := database.Open(cfg.DB.DSN())
@@ -36,6 +39,18 @@ func main() {
 
 	health := handler.NewHealthHandler(db)
 	r.Get("/healthz", health.Live)
+
+	orderRepo := repository.NewOrderRepository(db)
+	orderSvc := service.NewOrderService(orderRepo)
+	orderHandler := handler.NewOrderHandler(orderSvc)
+
+	r.Route("/orders", func(r chi.Router) {
+		r.Get("/", orderHandler.List)
+		r.Post("/", orderHandler.Create)
+		r.Get("/{id}", orderHandler.GetByID)
+		r.Patch("/{id}/status", orderHandler.UpdateStatus)
+	})
+
 	r.Get("/readyz", health.Ready)
 
 	srv := &http.Server{
