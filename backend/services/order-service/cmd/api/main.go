@@ -64,7 +64,7 @@ func main() {
 	go func() {
 		logger.Info("server starting", "port", cfg.HTTPPort, "env", cfg.AppEnv)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Error("Server Error: ", err)
+			logger.Error("Server Error: ", "error", err)
 			os.Exit(1)
 		}
 	}()
@@ -77,7 +77,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		logger.Error("shutdown error: ", err)
+		logger.Error("shutdown error: ", "error", err)
 	}
 
 }

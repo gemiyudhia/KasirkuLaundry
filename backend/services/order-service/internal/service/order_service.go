@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"math"
 	"math/rand/v2"
 	"time"
 
@@ -33,20 +32,7 @@ func NewOrderService(repo *repository.OrderRepository) *OrderService {
 }
 
 func (s *OrderService) Create(ctx context.Context, in CreateOrderInput) (*domain.Order, error) {
-	items := make([]domain.OrderItem, 0, len(in.Items))
-	var total int64
-
-	for _, it := range in.Items {
-		qty := math.Round(it.Quantity*100) / 100
-		subtotal := int64(math.Round(float64(it.UnitPrice) * qty))
-		items = append(items, domain.OrderItem{
-			ServiceName: it.ServiceName,
-			UnitPrice:   it.UnitPrice,
-			Quantity:    qty,
-			Subtotal:    subtotal,
-		})
-		total += subtotal
-	}
+	items, total := calculateItems(in.Items)
 
 	order := &domain.Order{
 		OrderCode:     generateOrderCode(),
@@ -60,6 +46,7 @@ func (s *OrderService) Create(ctx context.Context, in CreateOrderInput) (*domain
 	if err := s.repo.Create(ctx, order); err != nil {
 		return nil, err
 	}
+	// Ambil ulang supaya created_at/updated_at yang diisi MySQL ikut terbawa
 	return s.repo.GetByID(ctx, order.ID)
 }
 

@@ -31,7 +31,8 @@ func (s OrderStatus) IsValid() bool {
 }
 
 func (s OrderStatus) CanTransitionTo(next OrderStatus) bool {
-	return nextStatus[s] == next
+	want, ok := nextStatus[s]
+	return ok && want == next
 }
 
 var ErrOrderNotFound = errors.New("order not found")
