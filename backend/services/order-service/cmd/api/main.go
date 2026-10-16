@@ -10,11 +10,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/config"
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/database"
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/handler"
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/repository"
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/service"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/config"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/database"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/handler"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/repository"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/service"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )

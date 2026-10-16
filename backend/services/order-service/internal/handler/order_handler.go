@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/domain"
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/service"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/domain"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/service"
 	"github.com/go-chi/chi"
 	"github.com/go-playground/validator/v10"
 )

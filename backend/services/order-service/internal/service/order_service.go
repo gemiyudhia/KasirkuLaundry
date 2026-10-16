@@ -6,8 +6,8 @@ import (
 	"math/rand/v2"
 	"time"
 
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/domain"
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/repository"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/domain"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/repository"
 )
 
 type CreateOrderItemInput struct {
@@ -46,7 +46,6 @@ func (s *OrderService) Create(ctx context.Context, in CreateOrderInput) (*domain
 	if err := s.repo.Create(ctx, order); err != nil {
 		return nil, err
 	}
-	// Ambil ulang supaya created_at/updated_at yang diisi MySQL ikut terbawa
 	return s.repo.GetByID(ctx, order.ID)
 }
 

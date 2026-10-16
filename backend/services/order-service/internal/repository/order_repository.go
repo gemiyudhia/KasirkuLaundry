@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/domain"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/domain"
 )
 
 type OrderRepository struct {

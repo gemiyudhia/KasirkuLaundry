@@ -3,7 +3,7 @@ package service
 import (
 	"math"
 
-	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/services/order-service/internal/domain"
+	"github.com/gemiyudhia/KasirkuLaundry/services/order-service/internal/domain"
 )
 
 func calculateItems(in []CreateOrderItemInput) ([]domain.OrderItem, int64) {
